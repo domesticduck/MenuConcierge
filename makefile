@@ -1,6 +1,6 @@
 
-MOD_NAME = HelloApp
-MOD_SRC  = HelloApp.cpp
+MOD_NAME = MenuConcierge
+MOD_SRC  = MenuConcierge.cpp
 MOD_OBJ  = $(MOD_SRC:.cpp=.o)
 
 INC_PATH = \
