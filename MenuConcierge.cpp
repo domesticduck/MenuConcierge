@@ -1,156 +1,71 @@
-/**
- * @file MenuConcierge.cpp
- * @brief SPCƒtƒŒ[ƒ€ƒ[ƒNƒTƒ“ƒvƒ‹ƒAƒvƒŠƒP[ƒVƒ‡ƒ“AƒƒCƒ“ƒtƒ@ƒCƒ‹
- *
- * @note –{ƒTƒ“ƒvƒ‹ƒvƒƒOƒ‰ƒ€‚ÌÅIs‚É‚ ‚é•Ï”éŒ¾‚Í”ñí‚Éd—v‚Å‚·B
- * SPCƒtƒŒ[ƒ€ƒ[ƒN‚ÍAuspcAppv‚ÆŒ¾‚¤ŒÅ’è‚Ì•Ï”‚É‘Î‚µ‚Äˆ—‚ğs‚¤‚æ‚¤‚Éì‚ç‚ê‚Ä‚¢‚Ü‚·B
- */
 
-#include "spc/spcbase.h"
+#include "MenuConcierge.h"
+#include <spc/spcbase.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <Poco/Net/HTTPClientSession.h>
+#include <Poco/Net/HTTPRequest.h>
+#include <Poco/Net/HTTPResponse.h>
+#include <Poco/URI.h>
 
-/**
- * ŠçŒŸoƒCƒxƒ“ƒgA“®‘ÌŒŸ’mƒCƒxƒ“ƒg‚É”½‰‚µ‚ÄAPALRO‚ÆŠÈ’P‚È‰ï˜b‚ğs‚¤ƒTƒ“ƒvƒ‹‚Å‚·B
- *
- * ŠçŒŸoƒCƒxƒ“ƒg‚Å’Ê’m‚³‚ê‚½–¼‘O‚ğ‹L‰¯‚µA“®‘ÌŒŸ’mƒCƒxƒ“ƒg‚Ì‚ÉŒÄ‚Ñ‚©‚¯‚Ü‚·B
- * ‚Ü‚½AŒÄ‚Ñ‚©‚¯‚ÍA w ‚Í‚¢BxAw ‚¢‚¢‚¦B xAw ‚â‚ß‚éB x ‚Ì3‘ğŒ`®‚Ì¿–â—v‹API‚ğg—p‚µ‚Äs‚¢A
- * w ‚â‚ß‚éB x‚Æ“š‚¦‚½‚ÉƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ğI—¹‚µ‚Ü‚·B
- * ŠçŒŸoŒã‚ÉAŠç”F¯‚ª‚Å‚«‚È‚­‚È‚Á‚½ê‡‚É‚àAŠçŒŸoƒCƒxƒ“ƒg‚Å’Ê’m‚³‚ê‚½–¼‘O‚ÅŒÄ‚Ñ‚©‚¯‚Ü‚·B
- *
- */
-class MenuConcierge : spc::SPCBase {
+#include "XmlAccessor.hpp"
 
-  private:
-    std::string face_catch_name;
+namespace spc {
+	// ãƒ¡ã‚¤ãƒ³ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
+	void MenuConcierge::onInitialize(){
+		
+		
+		// ã‚ªã‚¤ã‚·ã‚¤ã€ã‚¦ãƒã‚¤ã€ã‚¦ãƒƒãƒã®ã„ãšã‚Œã‹ã‚’èªè­˜ã™ã‚‹
+ 		SPC_ANSWER answer;
+ 		std::vector<std::string> answerWords;
+ 		std::string recogWord;
+ 		int recogIndex;
 
-  public:
+ 		// èªè­˜ã—ãŸã„è¨€è‘‰ã‚’å…¨è§’ã‚«ã‚¿ã‚«ãƒŠã§è¿½åŠ ã™ã‚‹
+ 		answerWords.push_back("ã‚ªã‚¤ã‚·ã‚¤");
+ 		answerWords.push_back("ã‚¦ãƒã‚¤");
+ 		answerWords.push_back("ã‚¦ãƒƒãƒ");
 
-    /**
-     * @brief SPC‹N“®‚ÉƒtƒŒ[ƒ€ƒ[ƒN‚É‚æ‚èŒÄ‚Ño‚³‚ê‚éƒCƒ“ƒ^ƒtƒF[ƒXB
-     *
-     */
-    void onInitialize() {
-        long    result;
+ 		// è³ªå•ã‚’ã™ã‚‹
+ 		long rtn;
+ 		rtn = waitForAnswer("ãã‚‡ãƒ¼ã†ã®ã”ã¯ã‚“ã¯ãªãƒ¼ã«ã‹ãªãƒ¼ï¼Ÿ",
+              answerWords,
+              answer,
+              recogWord,
+              recogIndex);
+ 		if(rtn != 0){
+   		// waitForAnswerå‡¦ç†å¤±æ•—
+   		// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®çµ‚äº†
+   		exitComponent();
+   		return;
+ 		}
+ 		switch(answer){
+   		case SPC_ANSWER_RECOGEND:
+     		// ã“ã“ã«è³ªå•ãŒæ­£å¸¸çµ‚äº†ã—ãŸå ´åˆã®å‡¦ç†ã‚’è¨˜è¿°ã™ã‚‹
+ 	
+ 			speak("ãŠã„ã—ãã†ã§ã™ã­ãƒ¼ã€‚");
+ 	
+     		// èªè­˜ã—ãŸå˜èªã¯ã€recogWordã€ãŠã‚ˆã³ answerWords[recogIndex] ã§å–å¾—ã§ãã‚‹
+     		break;
 
-        face_catch_name = "";
+   		case SPC_ANSWER_CANCEL:
+     		// ã“ã“ã«ã€Œã‚„ã‚ã‚‹ã€ã‚’èªè­˜ã—ãŸæ™‚ã®å‡¦ç†ã‚’è¨˜è¿°ã™ã‚‹
+ 	
+ 	 		speak("ã‚„ã‚ã‚‹");
+ 	
+     		break;
 
-        // ”­˜b‚Í•K{‚Å‚Í‚ ‚è‚Ü‚¹‚ñ‚ªAƒAƒvƒŠƒP[ƒVƒ‡ƒ“‹N“®Šm”F‚Ì‚½‚ß‚É”­˜b‚³‚¹‚Ä‚¢‚Ü‚·B
-        result = speak("ƒTƒ“ƒvƒ‹‹N“®‚µ‚Ü‚µ‚½");
+   		case SPC_ANSWER_TIMEOUT:
+     		// ã“ã“ã«è³ªå•å‡¦ç†ãŒã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆã—ãŸæ™‚ã®å‡¦ç†ã‚’è¨˜è¿°ã™ã‚‹
+ 	
+ 	 		speak("ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆ");
+ 	
+     		break;
 
-        // “®‘ÌŒŸ’m‚ğŠJn
-        result = startDetectMovingObject();
-        if(result != 0){
-            // ”­˜bAPIŒÄ‚Ño‚µ
-            result = speak("“®‘ÌŒŸ’mŠJn‚Í¸”s‚µ‚Ü‚µ‚½A"
-            "“®‘ÌŒŸ’m‚ª‚Å‚«‚È‚¢‚½‚ßƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ğI—¹‚µ‚Ü‚·B");
-
-            // ƒAƒvƒŠƒP[ƒVƒ‡ƒ“I—¹APIŒÄ‚Ño‚µ
-            result = exitComponent();
-        }
-    }
-
-    /**
-     * @brief l‚ÌŠç‚ğŒŸo‚µ‚½Û‚ÉƒtƒŒ[ƒ€ƒ[ƒN‚É‚æ‚èŒÄ‚Ño‚³‚ê‚éƒCƒ“ƒ^ƒtƒF[ƒX
-     * @param name ”F¯‚µ‚½ŒÂl‚Ì“o˜^–¼(‘SŠpƒJƒ^ƒJƒi). ŒÂl–¢Šm’è‚Ìê‡‚Í‹ó”’•¶š—ñ
-     * @param owner ”F¯‚µ‚½ŒÂl‚ªPALRO‚ÌƒI[ƒi[‚Å‚ ‚é‚©‚Ç‚¤‚©. ƒI[ƒi[‚Ìê‡‚Ítrue
-     *
-     */
-    void onFaceCatch(std::string name, bool owner) {
-        long    result;
-        std::string str;
-
-        /*
-         * Šç¯•ÊŒ‹‰Ê‚Ì“o˜^–¼‚ªŠi”[‚³‚ê‚Ä‚¢‚éê‡‚ÍA“o˜^–¼‚ÅŒÄ‚Ñ‚©‚¯‚Ü‚·B
-         */
-        if(name != ""){       // “o˜^Ò‚Ìê‡
-            // ”­˜b“à—e‘g‚İ—§‚Ä
-            face_catch_name = name + "‚³‚ñ";
-            str = name + "A‚±‚ñ‚É‚¿‚í";
-        }
-        else{   // –¢’m‚Ìl‚Ìê‡
-            face_catch_name = "‚ ‚Ì[";
-            str = "‚Ç‚È‚½‚©‚í‚©‚è‚Ü‚¹‚ñ‚ªA‚±‚ñ‚É‚¿‚í";
-        }
-
-        // ”­˜bAPIŒÄ‚Ño‚µ
-        result = speak(str);
-    }
-
-    /**
-     * @brief onCatchedFaceŒã‚ÉAŠç‚ğŒ©¸‚Á‚½Û‚ÉƒtƒŒ[ƒ€ƒ[ƒN‚É‚æ‚èŒÄ‚Ño‚³‚ê‚éƒCƒ“ƒ^ƒtƒF[ƒX
-     *
-     * ŠçŒŸo‚ªs‚í‚ê‚½Œã‚Å‚ ‚ê‚ÎAŠçŒŸo‚Åİ’è‚µ‚½ŒÄ‚Ñ–¼‚ğ2‰ñ”­˜b‚µ‚Ü‚·B
-     */
-    void onFaceDrop() {
-        if(face_catch_name != ""){
-            long    result;
-
-            // ”­˜bAPIŒÄ‚Ño‚µ
-            result = speak(face_catch_name);
-            result = speak("‚Ç‚±‚Å‚·‚©[H");
-        }
-    }
-
-    /**
-     * @brief “®‘Ì‚ğŒŸ’m‚µ‚½Û‚ÉƒtƒŒ[ƒ€ƒ[ƒN‚É‚æ‚èŒÄ‚Ño‚³‚ê‚éƒCƒ“ƒ^ƒtƒF[ƒX
-     * @param speed “®‘ÌˆÚ“®‘¬“x
-     * @param direction ŒŸ’m‚µ‚½“®‘Ì‚Ì•ûŒü
-     *
-     * “®‘Ì‚ğŒŸ’m‚µ‚½‚çAŠçŒŸo‚Åİ’è‚µ‚½ŒÄ‚Ñ–¼‚ğg—p‚µ‚ÄA“®‘ÌŒŸ’m‚ğ’m‚ç‚¹‚Ü‚·B
-     */
-    void onMovingObjectCatch(float speed, spc::SPC_MOVING_OBJECT_DIRECTION direction)
-    {
-        long    result;
-
-        if(face_catch_name != ""){
-            spc::SPC_ANSWER ans_result;
-
-            // ”­˜bAPIŒÄ‚Ño‚µ
-            result = speak(face_catch_name);
-
-            /*
-             * ¿–â—v‹(Yes/No)
-             *  w ‚Í‚¢BxAw ‚¢‚¢‚¦B xAw ‚â‚ß‚éB x ‚Å‰ñ“š‚·‚é¿–â‚ğ‚·‚é
-             */
-            result = waitForAnswer("¡A‰½‚©“®‚«‚Ü‚µ‚½‚©H", ans_result);
-
-            // ¿–âŒ‹‰ÊŠm”F
-            if(result == spc::SPC_ANSWER_RECOGEND){
-                switch(ans_result){
-                case spc::SPC_ANSWER_YES:   // w ‚Í‚¢Bx ‚Æ‰ñ“š‚³‚ê‚½
-                    result = speak("‚â‚Á‚Ï‚è‚»‚¤‚Å‚·‚©B");
-                    break;
-                case spc::SPC_ANSWER_NO:        // w ‚¢‚¢‚¦Bx ‚Æ‰ñ“š‚³‚ê‚½
-                    result = speak("‚¨‚©‚µ‚¢‚È‚ŸB");
-                    break;
-                case spc::SPC_ANSWER_CANCEL:    // w ‚â‚ß‚éBx ‚Æ‰ñ“š‚³‚ê‚½
-                    result = speak("‚í‚©‚è‚Ü‚µ‚½AƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ğI—¹‚µ‚Ü‚·B");
-
-                    // ƒAƒvƒŠƒP[ƒVƒ‡ƒ“I—¹APIŒÄ‚Ño‚µ
-                    result = exitComponent();
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * @brief SPCI—¹‚ÉƒtƒŒ[ƒ€ƒ[ƒN‚É‚æ‚èŒÄ‚Ño‚³‚ê‚éƒCƒ“ƒ^ƒtƒF[ƒXB
-     *
-     * onInitialize‚ÅŠJn‚µ‚½“®‘ÌŒŸ’m‚ğI—¹‚³‚¹ASPCƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ğI—¹‚³‚¹‚éB
-     */
-    void onFinalize() {
-        long    result;
-
-        // onInitialize‚Å“®‘ÌŒŸ’m‚ğŠJn‚µ‚½‚Ì‚ÅA“®‘ÌŒŸ’m‚ğI—¹‚·‚é
-        result = stopDetectMovingObject();
-
-        // SPCI—¹
-        //exit(0);
-    }
-
-};
-
-// SPCƒAƒvƒŠƒP[ƒVƒ‡ƒ“ƒCƒ“ƒXƒ^ƒ“ƒX¶¬
-MenuConcierge   spcApp;
+   		default:
+     		break;
+ 		}
+	}	
+}
