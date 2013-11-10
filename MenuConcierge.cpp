@@ -10,16 +10,22 @@
 #include <Poco/Net/HTTPResponse.h>
 #include <Poco/URI.h>
 
-#include "XmlAccessor.hpp"
+#include "Menus.hpp"
 
 namespace spc {
 	// メインプロシージャ
 	void MenuConcierge::onInitialize(){
 		
 		setLogLevel(SPC_LOG_LEVEL_TRACE); 
+    SPC_LOG_DEBUG("*** start ***");
 
-    	SPC_LOG_DEBUG("*** start ***");
-		
+    std::string ans;
+
+    Model::Menus menus("http://192.168.3.7:3000/menus.text");
+    menus.get(ans); 
+
+    speak(ans);
+
 		// オイシイ、ウマイ、ウッマのいずれかを認識する
  		SPC_ANSWER answer;
 		SPC_ANSWER free_answer;
