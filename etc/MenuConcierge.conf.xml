@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palro_application name="MenuConcierge" version="1.0.0" releasedate="2013/11/10" type="SPC" mode="transient" appkind="application/other" language="ja">
+  <title>メニューコンシェルジュ</title>
+  <titlespk>メニューコンシェルジュ</titlespk>
+  <description>メニューを保存します</description>
+</palro_application>
