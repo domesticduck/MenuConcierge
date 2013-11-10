@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<palro_application name="MenuConcierge" version="1.0.0" releasedate="2013/11/09" type="SPC" mode="transient" appkind="application/other" language="ja">
-  <title>献立支援</title>
-  <titlespk>こんだてしえん</titlespk>
-  <description>お母さんが献立を考えたりするのをサポートします。</description>
-</palro_application>
