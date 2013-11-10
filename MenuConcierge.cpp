@@ -20,16 +20,17 @@ namespace spc {
 
     	SPC_LOG_DEBUG("*** start ***");
 		
-		// オイシイ、ウマイ、ウッマのいずれかを認識する
  		SPC_ANSWER answer;
-		SPC_ANSWER free_answer;
+		SPC_ANSWER free_answer;	
  		std::vector<std::string> answerWords;
  		std::string recogWord;
 		std::string recog;
+		std::string recog_sub;		
  		int recogIndex;
 
  		// 認識したい言葉を全角カタカナで追加する
- 		answerWords.push_back("オイシイ");
+		// オイシイ、ウマイ、ウッマのいずれかを認識する
+		answerWords.push_back("オイシイ");
  		answerWords.push_back("ウマイ");
  		answerWords.push_back("ウッマ");
 
@@ -66,10 +67,71 @@ namespace spc {
      			// 自由回答を認識した
  	
      			// 認識結果は recog に格納される。
- 	 			speak(recog);
+ 	 			speak(recog + "ですか");
  				speak("なるほど！なるほど！");
+
  				//TODO: recogの内容railsへ保存する。
+ 				//TODO: String型の文字列(ここでは変数のrecogを渡して、railsで保存するメソッド)返り値で保存の成否と保存したメインメニューのID？
  	
+ 				// 質問をする
+ 				long rtn;
+ 				rtn = waitForAnswer("その他のおかずは何ですか？", free_answer, recog_sub);
+ 				if(rtn != 0){
+   				// waitForAnswer処理失敗
+   				// アプリケーションの終了
+   				exitComponent();
+   				return;
+ 				}
+ 				
+ 				switch(free_answer){
+   				case SPC_ANSWER_FREE_WORD:
+     				// 自由回答を認識した
+ 	
+     				// 認識結果は recog_sub に格納される。
+ 	 				speak(recog_sub + "ですね");
+ 					speak("うん！うん！");
+
+ 					//TODO: recog_subの内容とメインメニューのIDをrailsへ渡し紐付けて保存する。
+ 					//TODO: String型の文字列とメインメニューのIDを渡す、返り値を受けて保存に成功：失敗
+
+ 					do{
+ 						// 質問をする
+ 						long rtn;
+ 						rtn = waitForAnswer("他にはありますか？", free_answer, recog_sub);
+ 						if(rtn != 0){
+   							// waitForAnswer処理失敗
+   							// アプリケーションの終了
+   							exitComponent();
+   							return;
+						}
+ 						if(recog_sub != "いいえ"){
+ 							//TODO: recog_subの内容とメインメニューのIDをrailsへ渡し紐付けて保存する。
+ 							//TODO: String型の文字列とメインメニューのIDを渡す、返り値を受けて保存に成功：失敗
+ 							speak("ふむふむ");
+ 						}
+ 					}	
+ 					while(recog_sub != "いいえ");
+ 						speak("なるほどー");
+ 						break;
+ 					
+   				case SPC_ANSWER_TIMEOUT:
+     				// 質問がタイムアウトした
+ 	
+ 					speak("返答が無かったので終了しました。");
+ 	
+     			break;
+
+   				case SPC_ANSWER_RETRYOUT:
+     				// 質問を再確認したが回答が聞き取れなかった
+ 	
+ 					speak("回答が聞き取れませんでした");
+ 	
+     				break;
+
+   				default:
+     				break;
+ 				}
+ 			
      			break;
 
    			case SPC_ANSWER_TIMEOUT:
