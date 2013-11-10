@@ -20,72 +20,68 @@ namespace spc {
 		
 		setLogLevel(SPC_LOG_LEVEL_TRACE); 
     SPC_LOG_DEBUG("*** start ***");
+    Menus menus; 
+    Menus sub_menus; 
+    Menus sub_menus2; 
 
-    std::string ans;
+    // オイシイ、ウマイ、ウッマのいずれかを認識する
+    SPC_ANSWER answer;
+    SPC_ANSWER free_answer; 
+    std::vector<std::string> answerWords;
+    std::string recogWord;
+    std::string recog;
+    std::string recog_sub;    
+    int recogIndex;
 
-    Model::Menus menus("http://192.168.3.7:3000"); 
+    // 認識したい言葉を全角カタカナで追加する
+    // オイシイ、ウマイ、ウッマのいずれかを認識する
+    answerWords.push_back("オイシイ");
+    answerWords.push_back("ウマイ");
+    answerWords.push_back("ウッマ");
 
-    speak(ans);
-
-		// オイシイ、ウマイ、ウッマのいずれかを認識する
- 		SPC_ANSWER answer;
-		SPC_ANSWER free_answer;	
- 		std::vector<std::string> answerWords;
- 		std::string recogWord;
-		std::string recog;
-		std::string recog_sub;		
- 		int recogIndex;
-
- 		// 認識したい言葉を全角カタカナで追加する
-		// オイシイ、ウマイ、ウッマのいずれかを認識する
-		answerWords.push_back("オイシイ");
- 		answerWords.push_back("ウマイ");
- 		answerWords.push_back("ウッマ");
-
- 		// 質問をする
- 		long rtn;
- 		rtn = waitForAnswer("きょうのごはんはなにかなー？",
+    // 質問をする
+    long rtn;
+    rtn = waitForAnswer("きょうのごはんはなにかなー？",
               answerWords,
               answer,
               recogWord,
               recogIndex);
- 		if(rtn != 0){
-   		// waitForAnswer処理失敗
-   		// アプリケーションの終了
-   		exitComponent();
-   		return;
- 		}
- 		switch(answer){
-   		case SPC_ANSWER_RECOGEND:
-     		// ここに質問が正常終了した場合の処理を記述する
- 	
- 			speak("おいしそうですねー。");
- 			
- 			 // 質問をする
- 			long rtn;
- 			rtn = waitForAnswer("きょうのこんだては何ですか？", free_answer, recog);
- 			if(rtn != 0){
-   			// waitForAnswer処理失敗
-   			// アプリケーションの終了
-   			exitComponent();
-   			return;
- 			}
- 			switch(free_answer){
-   			case SPC_ANSWER_FREE_WORD:
-     			// 自由回答を認識した
- 	
-     			// 認識結果は recog に格納される。
- 	 			speak(recog + "ですか");
- 				speak("なるほど！なるほど！");
+    if(rtn != 0){
+      // waitForAnswer処理失敗
+      // アプリケーションの終了
+      exitComponent();
+      return;
+    }
+    switch(answer){
+      case SPC_ANSWER_RECOGEND:
+        // ここに質問が正常終了した場合の処理を記述する
+  
+      speak("おいしそうですねー。");
+      
+       // 質問をする
+      long rtn;
+      rtn = waitForAnswer("きょうのこんだては何ですか？", free_answer, recog);
+      if(rtn != 0){
+        // waitForAnswer処理失敗
+        // アプリケーションの終了
+        exitComponent();
+        return;
+      }
+      switch(free_answer){
+        case SPC_ANSWER_FREE_WORD:
+          // 自由回答を認識した
+  
+          // 認識結果は recog に格納される。
+        speak(recog + "ですか");
+        speak("なるほど！なるほど！");
 
- 				//TODO: recogの内容railsへ保存する。
- 				//TODO: String型の文字列(ここでは変数のrecogを渡して、railsで保存するメソッド)返り値で保存の成否と保存したメインメニューのID？
+        //メニューをrailsへ保存する。
         menus.name = recog;
-        menus.create(); 	      
+        menus.create();         
 
- 				// 質問をする
- 				long rtn;
- 				rtn = waitForAnswer("その他のおかずは何ですか？", free_answer, recog_sub);
+        // 質問をする
+        long rtn;
+        rtn = waitForAnswer("その他のおかずは何ですか？", free_answer, recog_sub);
  				if(rtn != 0){
    				// waitForAnswer処理失敗
    				// アプリケーションの終了
@@ -101,8 +97,10 @@ namespace spc {
  	 				speak(recog_sub + "ですね");
  					speak("うん！うん！");
 
- 					//TODO: recog_subの内容とメインメニューのIDをrailsへ渡し紐付けて保存する。
- 					//TODO: String型の文字列とメインメニューのIDを渡す、返り値を受けて保存に成功：失敗
+ 					//サブメニューとメインメニューをひもづけて保存する。
+          sub_menus.name = recog_sub;
+          sub_menus.main_id = menus.id;
+          sub_menus.create();
 
  					do{
  						// 質問をする
@@ -115,8 +113,9 @@ namespace spc {
    							return;
 						}
  						if(recog_sub != "いいえ"){
- 							//TODO: recog_subの内容とメインメニューのIDをrailsへ渡し紐付けて保存する。
- 							//TODO: String型の文字列とメインメニューのIDを渡す、返り値を受けて保存に成功：失敗
+              sub_menus2.name = recog_sub;
+              sub_menus2.main_id = menus.id;
+              sub_menus2.create();
  							speak("ふむふむ");
  						}
  					}	

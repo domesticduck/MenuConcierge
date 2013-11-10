@@ -22,13 +22,13 @@ namespace Model
     string path;
 
     public:
-        int id;
+        string id;
         string name;
-        int main_id;
+        string main_id;
 
     public:
-        Menus(string url){
-            URI uri(url);
+        Menus(){
+            URI uri("http://192.168.3.7:3000");
             session.setHost(uri.getHost());
             session.setPort(uri.getPort());
 
@@ -64,20 +64,16 @@ namespace Model
             try
             {
                 // send request
-                HTTPRequest req(HTTPRequest::HTTP_POST, path + "menus", HTTPMessage::HTTP_1_1);
+                HTTPRequest req(HTTPRequest::HTTP_POST, path + "menus.text", HTTPMessage::HTTP_1_1);
                 session.sendRequest(req);
         //        req.setContentType("application/x-www-form-urlencoded\r\n");
                 req.setKeepAlive(true);
 
-                //string reqBody("menu.name=" + name +  "&menu.main_id=" + main_id);
                 string key_name("menu[name]=");
                 string delimiter("&");
                 string key_main_id("menu[main_id]=");
-                char str[40];
-                sprintf(str, "%d", main_id);
-                string str_main_id(str);
 
-                string reqBody(key_name + name + delimiter + key_main_id + str_main_id);
+                string reqBody(key_name + name + delimiter + key_main_id + main_id);
 
                 req.setContentLength( reqBody.length() );
 
@@ -88,9 +84,8 @@ namespace Model
                 cout << res.getStatus() << " " << res.getReason() << endl;
 
                 // print response
-                string ans;
                 istream &is = session.receiveResponse(res);
-                StreamCopier::copyToString(is, ans, 8192);
+                StreamCopier::copyToString(is, id, 8192);
             }
 
             catch (Exception &ex)
