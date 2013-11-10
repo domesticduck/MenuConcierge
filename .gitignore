@@ -3,6 +3,7 @@
 *.lo
 *.o
 *.zip
+MenuConcierge
 
 # Compiled Dynamic libraries
 *.so

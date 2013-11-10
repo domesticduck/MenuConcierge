@@ -12,6 +12,8 @@
 
 #include "Menus.hpp"
 
+using namespace Model;
+
 namespace spc {
 	// メインプロシージャ
 	void MenuConcierge::onInitialize(){
@@ -21,8 +23,7 @@ namespace spc {
 
     std::string ans;
 
-    Model::Menus menus("http://192.168.3.7:3000/menus.text");
-    menus.get(ans); 
+    Model::Menus menus("http://192.168.3.7:3000"); 
 
     speak(ans);
 
@@ -79,7 +80,9 @@ namespace spc {
 
  				//TODO: recogの内容railsへ保存する。
  				//TODO: String型の文字列(ここでは変数のrecogを渡して、railsで保存するメソッド)返り値で保存の成否と保存したメインメニューのID？
- 	
+        menus.name = recog;
+        menus.create(); 	      
+
  				// 質問をする
  				long rtn;
  				rtn = waitForAnswer("その他のおかずは何ですか？", free_answer, recog_sub);
