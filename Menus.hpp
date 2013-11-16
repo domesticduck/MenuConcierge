@@ -28,7 +28,7 @@ namespace Model
 
     public:
         Menus(){
-            URI uri("http://192.168.3.7:3000");
+            URI uri("http://192.168.3.6:3000");
             session.setHost(uri.getHost());
             session.setPort(uri.getPort());
 
@@ -66,7 +66,6 @@ namespace Model
                 // send request
                 HTTPRequest req(HTTPRequest::HTTP_POST, path + "menus.text", HTTPMessage::HTTP_1_1);
                 session.sendRequest(req);
-        //        req.setContentType("application/x-www-form-urlencoded\r\n");
                 req.setKeepAlive(true);
 
                 string key_name("menu[name]=");
@@ -76,7 +75,6 @@ namespace Model
                 string reqBody(key_name + name + delimiter + key_main_id + main_id);
 
                 req.setContentLength( reqBody.length() );
-
                 session.sendRequest(req) << reqBody;
 
                 // get response
@@ -95,5 +93,62 @@ namespace Model
             }
             return 0;
         }
+
+        string select_main_menu(){
+            try
+            {
+                // send request
+                HTTPRequest req(HTTPRequest::HTTP_GET, path + "menus/select_main_menu.text", HTTPMessage::HTTP_1_1);
+                session.sendRequest(req);
+
+                // get response
+                HTTPResponse res;
+
+                // print response
+                string ans;
+                istream &is = session.receiveResponse(res);
+                StreamCopier::copyToString(is, ans, 8192);
+
+                return ans;
+            }
+
+            catch (Exception &ex)
+            {
+                cerr << ex.displayText() << endl;
+                return "";
+            }
+            return "";
+        }
+
+
+        string select_sub_menu(string main_id){
+            try
+            {
+                // send request
+                string key_main_id("menu[main_id]");
+
+                HTTPRequest req(HTTPRequest::HTTP_GET, path + "menus/select_sub_menu.text?" + key_main_id + "=" + main_id, HTTPMessage::HTTP_1_1);
+                session.sendRequest(req);
+
+                // get response
+                HTTPResponse res;
+
+                // print response
+                string ans;
+                istream &is = session.receiveResponse(res);
+                StreamCopier::copyToString(is, ans, 8192);
+
+                return ans;
+            }
+
+            catch (Exception &ex)
+            {
+                cerr << ex.displayText() << endl;
+                return "";
+            }
+            return "";
+        }
+
+
     };
 }
