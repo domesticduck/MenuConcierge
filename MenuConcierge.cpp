@@ -41,7 +41,7 @@ namespace spc {
 
     // 質問をする
     long rtn;
-    rtn = waitForAnswer("きょうのごはんはなにかなー？",
+    rtn = waitForAnswer("今日もおいしそうなご飯ですねー",
               answerWords,
               answer,
               recogWord,
@@ -60,7 +60,7 @@ namespace spc {
       
        // 質問をする
       long rtn;
-      rtn = waitForAnswer("きょうのこんだては何ですか？", free_answer, recog);
+      rtn = waitForAnswer("今日の献立は何ですか？", free_answer, recog);
       if(rtn != 0){
         // waitForAnswer処理失敗
         // アプリケーションの終了
@@ -112,14 +112,14 @@ namespace spc {
    							exitComponent();
    							return;
 						}
- 						if(recog_sub != "いいえ"){
+ 						if(recog_sub != "ないよ"){
               sub_menus2.name = recog_sub;
               sub_menus2.main_id = menus.id;
               sub_menus2.create();
  							speak("ふむふむ");
  						}
  					}	
- 					while(recog_sub != "いいえ");
+ 					while(recog_sub != "ないよ");
  						speak("なるほどー");
  						break;
  					
